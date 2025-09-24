@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using Int = System.Int32;
+
 public class CharacterUIManager : MonoBehaviour
 {
     public Character character;
@@ -24,7 +26,7 @@ public class CharacterUIManager : MonoBehaviour
     public void OnHealthChanged(string value)
     {
         int n;
-        if (System.Int32.TryParse(value, out n))
+        if (Int.TryParse(value, out n))
         {
             character.health = n;
         }
@@ -33,7 +35,7 @@ public class CharacterUIManager : MonoBehaviour
     public void OnStrengthChanged(string value)
     {
         int n;
-        if (System.Int32.TryParse(value, out n))
+        if (Int.TryParse(value, out n))
         {
             character.strength = n;
         }
@@ -42,7 +44,7 @@ public class CharacterUIManager : MonoBehaviour
     public void OnIntelligenceChanged(string value)
     {
         int n;
-        if (System.Int32.TryParse(value, out n))
+        if (Int.TryParse(value, out n))
         {
             character.intelligence = n;
         }
@@ -51,7 +53,7 @@ public class CharacterUIManager : MonoBehaviour
     public void OnDexterityChanged(string value)
     {
         int n;
-        if (System.Int32.TryParse(value, out n))
+        if (Int.TryParse(value, out n))
         {
             character.dexterity = n;
         }
