@@ -1,0 +1,11 @@
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\bin\Release\netstandard2.0\ExampleSourceGenerator.deps.json
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\bin\Release\netstandard2.0\ExampleSourceGenerator.dll
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\bin\Release\netstandard2.0\ExampleSourceGenerator.pdb
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.csproj.AssemblyReference.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.AssemblyInfoInputs.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.AssemblyInfo.cs
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.csproj.CoreCompileInputs.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.sourcelink.json
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.dll
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Source Generator\ExampleSourceGenerator\obj\Release\netstandard2.0\ExampleSourceGenerator.pdb

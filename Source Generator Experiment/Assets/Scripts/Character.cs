@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[System.Serializable]
-public class Character
+[System.Serializable, EnumerateChildren]
+public partial class Character
 {
     public string name;
     public int health, strength, intelligence, dexterity;

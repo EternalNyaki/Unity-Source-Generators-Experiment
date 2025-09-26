@@ -1,0 +1,11 @@
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\bin\Release\netstandard2.0\SubClassEnumGenerator.deps.json
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\bin\Release\netstandard2.0\SubClassEnumGenerator.dll
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\bin\Release\netstandard2.0\SubClassEnumGenerator.pdb
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.csproj.AssemblyReference.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.AssemblyInfoInputs.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.AssemblyInfo.cs
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.csproj.CoreCompileInputs.cache
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.sourcelink.json
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.dll
+C:\Users\etern\OneDrive\Documents\GitHub\Unity-Source-Generators-Experiment\Subclass Enum Generator\SubClassEnumGenerator\obj\Release\netstandard2.0\SubClassEnumGenerator.pdb

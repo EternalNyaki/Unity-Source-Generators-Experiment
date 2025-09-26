@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Rogue
+public class Rogue : Character
 {
     public OneHandedWeapon weapon;
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Paladin
+public class Paladin : Character
 {
     public int faith;
     public TwoHandedWeapon weapon;
