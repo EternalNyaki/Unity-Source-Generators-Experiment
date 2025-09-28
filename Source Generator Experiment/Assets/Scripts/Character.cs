@@ -1,8 +1,19 @@
 using UnityEngine;
 
 [System.Serializable, EnumerateChildren]
-public partial class Character
+public abstract partial class Character
 {
     public string name;
     public int health, strength, intelligence, dexterity;
+
+    public Character() { }
+
+    public Character(Character character)
+    {
+        name = character.name;
+        health = character.health;
+        strength = character.strength;
+        intelligence = character.intelligence;
+        dexterity = character.dexterity;
+    }
 }

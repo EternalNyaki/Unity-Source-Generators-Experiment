@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
@@ -13,6 +14,7 @@ namespace SubClassEnumGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
+            // Register syntax reciever factory
             context.RegisterForSyntaxNotifications(() => new SuperClassSyntaxReceiver());
         }
 
@@ -25,35 +27,61 @@ namespace SubClassEnumGenerator
             List<ClassDeclarationSyntax> userClasses = syntaxReceiver.SuperClassesToEnumerate;
             if (userClasses == null || userClasses.Count < 0)
             {
+                // If there are no recorded user classes, we don't need to do anything
                 return;
             }
 
             Compilation compilation = context.Compilation;
 
+            List<ClassDeclarationSyntax> nonPartialClasses = new List<ClassDeclarationSyntax>();
             foreach (var userClass in userClasses)
             {
+                // Check if class is partial to ensure we can properly generate an extension to it
+                bool isPartial = userClass.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword));
+                if (!isPartial)
+                {
+                    // If class isn't partial, mark it for error logging and move to next class
+                    nonPartialClasses.Add(userClass);
+                    continue;
+                }
+
                 INamedTypeSymbol userClassSymbol = compilation.GetTypeByMetadataName(userClass.Identifier.ToString());
 
-                var sourceBuilder = new StringBuilder(
-            $@"
-            public partial class {userClass.Identifier}
-            {{
-                public enum {userClass.Identifier}SubClass
-                {{");
+                // Generate class extention with the new enum
+                var sourceBuilder = new StringBuilder($@"
+public partial class {userClass.Identifier}
+{{
+    public enum {userClass.Identifier}SubClass
+    {{");
 
                 foreach (var sc in SubClassFinder.FindSubClasses(compilation, userClassSymbol))
                 {
                     sourceBuilder.Append($@"
-                    {sc.Name},");
+        {sc.Name},");
                 }
 
                 sourceBuilder.Append($@"
-                }}
+    }}
 }}
 ");
 
                 string sourceName = userClass.Identifier.ToString() + ".Generated.cs";
                 context.AddSource(sourceName, SourceText.From(sourceBuilder.ToString(), Encoding.UTF8));
+            }
+
+            if (nonPartialClasses.Count > 0)
+            {
+                // If there were any invalid classes, throw an exception after all other classes have been generated
+                StringBuilder exceptionMessage = new StringBuilder
+                    ("The following classes have been marked for generation but not made partial: ");
+                foreach (var c in nonPartialClasses)
+                {
+                    exceptionMessage.Append(c.Identifier.ToString());
+                    exceptionMessage.Append(", ");
+                }
+                exceptionMessage.Append("make sure all classes marked for generation have the partial modifier");
+
+                throw new InvalidOperationException(exceptionMessage.ToString());
             }
         }
     }
@@ -62,6 +90,7 @@ namespace SubClassEnumGenerator
     {
         public List<ClassDeclarationSyntax> SuperClassesToEnumerate { get; private set; }
 
+        // Name of the attribute used to mark classes for generation
         private const string k_targetAttributeName = "EnumerateChildren";
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
