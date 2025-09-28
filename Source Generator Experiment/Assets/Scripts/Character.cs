@@ -17,3 +17,12 @@ public abstract partial class Character
         dexterity = character.dexterity;
     }
 }
+
+
+public struct SerializableCharacter
+{
+    public Character.CharacterSubClass characterClass;
+    public string name;
+    public int health, strength, intelligence, dexterity;
+    public int miscInt1, miscInt2;
+}
