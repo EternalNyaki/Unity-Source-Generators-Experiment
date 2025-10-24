@@ -14,7 +14,7 @@ namespace SubClassEnumGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            // Register syntax reciever factory
+            // Register syntax receiver factory
             context.RegisterForSyntaxNotifications(() => new SuperClassSyntaxReceiver());
         }
 
@@ -47,20 +47,76 @@ namespace SubClassEnumGenerator
 
                 INamedTypeSymbol userClassSymbol = compilation.GetTypeByMetadataName(userClass.Identifier.ToString());
 
-                // Generate class extention with the new enum
+                List<INamedTypeSymbol> subClasses;
+                string test = "test";
+                AttributeData attribute = null;
+                foreach (var attr in userClassSymbol.GetAttributes().ToArray())
+                {
+                    if (attr.AttributeClass.Name == "EnumerateChildrenAttribute")
+                    {
+                        attribute = attr;
+                    }
+                }
+
+                bool arg = (bool)attribute.ConstructorArguments[0].Value;
+                if (arg)
+                {
+                    subClasses = SubClassFinder.FindSubClasses(compilation, userClassSymbol);
+                }
+                else
+                {
+                    subClasses = SubClassFinder.FindImmediateSubClasses(compilation, userClassSymbol);
+                }
+
+                // Generate class extension
                 var sourceBuilder = new StringBuilder($@"
+using System;
+using System.Reflection;
+
 public partial class {userClass.Identifier}
 {{
+    public static string test = ""{test}"";
+
     public enum {userClass.Identifier}SubClass
     {{");
 
-                foreach (var sc in SubClassFinder.FindSubClasses(compilation, userClassSymbol))
+                foreach (var sc in subClasses)
                 {
                     sourceBuilder.Append($@"
         {sc.Name},");
                 }
 
                 sourceBuilder.Append($@"
+    }}
+
+    public static Type GetTypeOfSubClass ({userClass.Identifier}SubClass subClass)
+    {{
+        switch(subClass)
+        {{");
+                foreach (var sc in subClasses)
+                {
+                    sourceBuilder.Append($@"
+            case {userClass.Identifier}SubClass.{sc.Name}:
+                return typeof({sc.Name});
+                ");
+                }
+
+                sourceBuilder.Append($@"
+            default:
+                throw new ArgumentException(""Subclass "" + subClass.ToString() + "" does not exist"");
+        }}
+    }}
+
+    public static {userClass.Identifier}SubClass GetSubClassFromType (Type type)
+    {{");
+                foreach (var sc in subClasses)
+                {
+                    sourceBuilder.Append($@"
+        if(type == typeof({sc.Name})) {{ return {userClass.Identifier}SubClass.{sc.Name}; }}
+                ");
+                }
+                sourceBuilder.Append($@"
+        throw new ArgumentException(""Type "" + type.FullName + "" is not a subclass of {userClass.Identifier}"");
     }}
 }}
 ");
@@ -131,16 +187,37 @@ public partial class {userClass.Identifier}
 
     public static class SubClassFinder
     {
+        public static List<INamedTypeSymbol> FindSubClasses(Compilation compilation, INamedTypeSymbol baseClass)
+        {
+            List<INamedTypeSymbol> subClasses = new List<INamedTypeSymbol>();
+
+            foreach (var syntaxTree in compilation.SyntaxTrees)
+            {
+                SyntaxNode root = syntaxTree.GetRoot();
+                SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
+                foreach (var classDeclaration in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
+                {
+                    var t = compilation.GetTypeByMetadataName(classDeclaration.Identifier.ToString());
+                    if (t != null && IsSubClassOf(t, baseClass))
+                    {
+                        subClasses.Add(t);
+                    }
+                }
+            }
+
+            return subClasses;
+        }
+
         /// <summary>
         /// Finds and returns a list of all immediate sub-classes of the given
         /// base class within the given compilation
-        /// Only goes one level deep in the inhertance of potential sub-classes,
+        /// Only goes one level deep in the inheritance of potential sub-classes,
         /// so it won't identify sub-classes of sub-classes
         /// </summary>
         /// <param name="compilation"></param>
         /// <param name="baseClass"></param>
         /// <returns> A list of symbols representing all of the sub-classes </returns>
-        public static List<INamedTypeSymbol> FindSubClasses(Compilation compilation, INamedTypeSymbol baseClass)
+        public static List<INamedTypeSymbol> FindImmediateSubClasses(Compilation compilation, INamedTypeSymbol baseClass)
         {
             List<INamedTypeSymbol> subClasses = new List<INamedTypeSymbol>();
 
@@ -159,6 +236,23 @@ public partial class {userClass.Identifier}
             }
 
             return subClasses;
+        }
+
+        public static bool IsSubClassOf(INamedTypeSymbol potentialSubClass, INamedTypeSymbol baseClass)
+        {
+            INamedTypeSymbol currentBase = potentialSubClass.BaseType;
+
+            while (currentBase != null)
+            {
+                if (SymbolEqualityComparer.Default.Equals(currentBase, baseClass))
+                {
+                    return true;
+                }
+
+                currentBase = currentBase.BaseType;
+            }
+
+            return false;
         }
 
         public static bool IsImmediateSubClassOf(INamedTypeSymbol potentialSubClass, INamedTypeSymbol baseClass)

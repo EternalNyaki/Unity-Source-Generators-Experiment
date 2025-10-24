@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[System.Serializable, EnumerateChildren]
+[System.Serializable, EnumerateChildren(false)]
 public abstract partial class Character
 {
     public string name;
@@ -24,5 +24,5 @@ public struct SerializableCharacter
     public Character.CharacterSubClass characterClass;
     public string name;
     public int health, strength, intelligence, dexterity;
-    public int miscInt1, miscInt2;
+    public int[] miscData;
 }

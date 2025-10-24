@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -76,53 +77,40 @@ public class CharacterUIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        switch (characterClass)
+        foreach (var f in Character.GetTypeOfSubClass(characterClass).GetFields())
         {
-            case Character.CharacterSubClass.Rogue:
-                // Create info fields
-                // HACK: Ideally this would be done dynamically through reflection, but that's not my focus rn
-                CreateDropdownField("Weapon", typeof(OneHandedWeapon), value => ((Rogue)character).weapon = (OneHandedWeapon)value).value = (int)((Rogue)character).weapon;
-                break;
+            if (System.Array.Find(typeof(Character).GetFields(), field => field.Name == f.Name) != null) { continue; }
 
-            case Character.CharacterSubClass.Wizard:
-                // Create info fields
-                // HACK: Ideally this would be done dynamically through reflection, but that's not my focus rn
-                CreateDropdownField("Catalyst", typeof(Catalyst), value => ((Wizard)character).catalyst = (Catalyst)value).value = (int)((Wizard)character).catalyst;
-                CreateDropdownField("Affinity", typeof(Affinity), value => ((Wizard)character).affinity = (Affinity)value).value = (int)((Wizard)character).affinity;
-                break;
-
-            case Character.CharacterSubClass.Paladin:
-                // Create info fields
-                // HACK: Ideally this would be done dynamically through reflection, but that's not my focus rn
-                CreateIntField("Faith", value =>
+            if (f.FieldType == typeof(int))
+            {
+                CreateIntField(f.Name, value =>
                 {
                     int n;
                     if (Int.TryParse(value, out n))
                     {
-                        ((Paladin)character).faith = n;
+                        f.SetValue(character, n);
                     }
-                }).text = ((Paladin)character).faith.ToString();
-                CreateDropdownField("Weapon", typeof(TwoHandedWeapon), value => ((Paladin)character).weapon = (TwoHandedWeapon)value).value = (int)((Paladin)character).weapon;
-                break;
+                });
+            }
+            else if (f.FieldType.BaseType == typeof(System.Enum))
+            {
+                TMP_Dropdown dropdown = CreateDropdownField(f.Name, f.FieldType, value => f.SetValue(character, value));
+                dropdown.value = (int)f.GetValue(character);
+            }
         }
     }
 
     public void OnClassChanged(int value)
     {
         Character.CharacterSubClass cClass = (Character.CharacterSubClass)value;
-        switch (cClass)
+        System.Type cType = Character.GetTypeOfSubClass(cClass);
+        if (character == null)
         {
-            case Character.CharacterSubClass.Rogue:
-                character = character == null ? new Rogue() : new Rogue(character);
-                break;
-
-            case Character.CharacterSubClass.Wizard:
-                character = character == null ? new Wizard() : new Wizard(character);
-                break;
-
-            case Character.CharacterSubClass.Paladin:
-                character = character == null ? new Paladin() : new Paladin(character);
-                break;
+            character = (Character)cType.GetConstructor(new System.Type[0]).Invoke(new object[0]);
+        }
+        else
+        {
+            character = (Character)cType.GetConstructor(new System.Type[1] { typeof(Character) }).Invoke(new object[1] { character });
         }
 
         CreateClassFields(cClass);
@@ -173,34 +161,25 @@ public class CharacterUIManager : MonoBehaviour
     {
         SerializableCharacter data = new SerializableCharacter
         {
-            characterClass = default,
             name = character.name,
             health = character.health,
             strength = character.strength,
             intelligence = character.intelligence,
-            dexterity = character.dexterity,
-            miscInt1 = default,
-            miscInt2 = default
+            dexterity = character.dexterity
         };
 
-        //HACK: Yet another thing that could be done dynamically through reflection
-        if (character is Rogue rogue)
+        System.Type cType = character.GetType();
+        data.characterClass = Character.GetSubClassFromType(cType);
+
+        List<int> miscData = new List<Int>();
+        foreach (var f in cType.GetFields())
         {
-            data.characterClass = Character.CharacterSubClass.Rogue;
-            data.miscInt1 = (int)rogue.weapon;
+            if (System.Array.Find(typeof(Character).GetFields(), field => field.Name == f.Name) != null) { continue; }
+
+            int value = (int)System.Convert.ChangeType(f.GetValue(character), f.FieldType);
+            miscData.Add(value);
         }
-        else if (character is Wizard wizard)
-        {
-            data.characterClass = Character.CharacterSubClass.Wizard;
-            data.miscInt1 = (int)wizard.catalyst;
-            data.miscInt2 = (int)wizard.affinity;
-        }
-        else if (character is Paladin paladin)
-        {
-            data.characterClass = Character.CharacterSubClass.Paladin;
-            data.miscInt1 = paladin.faith;
-            data.miscInt2 = (int)paladin.weapon;
-        }
+        data.miscData = miscData.ToArray();
 
         string json = JsonUtility.ToJson(data);
         string path = Application.dataPath + "/Characters/" + data.name + ".json";
@@ -221,45 +200,32 @@ public class CharacterUIManager : MonoBehaviour
         string json = File.ReadAllText(path);
         SerializableCharacter data = JsonUtility.FromJson<SerializableCharacter>(json);
 
-        switch (data.characterClass)
+        System.Type cType = Character.GetTypeOfSubClass(data.characterClass);
+        character = (Character)cType.GetConstructor(new System.Type[0]).Invoke(new object[0]);
+        character.name = data.name;
+        character.health = data.health;
+        character.strength = data.strength;
+        character.intelligence = data.intelligence;
+        character.dexterity = data.dexterity;
+
+        int i = 0;
+        foreach (var f in cType.GetFields())
         {
-            case Character.CharacterSubClass.Rogue:
-                character = new Rogue
-                {
-                    name = data.name,
-                    health = data.health,
-                    strength = data.strength,
-                    intelligence = data.intelligence,
-                    dexterity = data.dexterity,
-                    weapon = (OneHandedWeapon)data.miscInt1
-                };
-                break;
+            if (System.Array.Find(typeof(Character).GetFields(), field => field.Name == f.Name) != null) { continue; }
 
-            case Character.CharacterSubClass.Wizard:
-                character = new Wizard
-                {
-                    name = data.name,
-                    health = data.health,
-                    strength = data.strength,
-                    intelligence = data.intelligence,
-                    dexterity = data.dexterity,
-                    catalyst = (Catalyst)data.miscInt1,
-                    affinity = (Affinity)data.miscInt2
-                };
-                break;
+            if (i >= data.miscData.Length) { break; }
 
-            case Character.CharacterSubClass.Paladin:
-                character = new Paladin
-                {
-                    name = data.name,
-                    health = data.health,
-                    strength = data.strength,
-                    intelligence = data.intelligence,
-                    dexterity = data.dexterity,
-                    faith = data.miscInt1,
-                    weapon = (TwoHandedWeapon)data.miscInt2
-                };
-                break;
+            if (f.FieldType.IsEnum)
+            {
+                object a = f.FieldType.GetEnumValues().GetValue(data.miscData[i]);
+                f.SetValue(character, f.FieldType.GetEnumValues().GetValue(data.miscData[i]));
+            }
+            else
+            {
+                f.SetValue(character, data.miscData[i]);
+            }
+
+            i++;
         }
 
         LoadFieldValues(data.characterClass);

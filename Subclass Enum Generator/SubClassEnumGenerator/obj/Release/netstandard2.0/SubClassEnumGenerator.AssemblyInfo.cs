@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SubClassEnumGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7270201ad8b8313b8f20bb9cd3e842d5f94dac02")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b003f1df9cfbc3a1357b4648e18306a2a14559d8")]
 [assembly: System.Reflection.AssemblyProductAttribute("SubClassEnumGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SubClassEnumGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
